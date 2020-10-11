@@ -1,31 +1,32 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
 namespace LinkerGenerator
 {
-    public static class LinkerGenerator
+    public class LinkerGenerator
     {
-        private static readonly string[] DontPreserveAssemblies =
-        {
-            "System.Net.Http",
-            "System.Text.Json",
-        };
+        private readonly LinkerSettings _settings;
 
-        [MenuItem("Window / Linker / Generate link.xml")]
-        public static void GenerateLinkXml()
+        public LinkerGenerator(LinkerSettings settings) => _settings = settings;
+
+        public void Generate()
         {
             var assetsDir = Application.dataPath;
             var dllsDir = Path.Combine(assetsDir, "NugetDlls");
 
             var dllTags = Directory.EnumerateFiles(dllsDir, "*.dll")
+                .Distinct()
                 .Select(Path.GetFileNameWithoutExtension)
-                .Where(AllowedForPreserve)
+                .Where(NotIgnored)
                 .Select(CreateAssemblyLinkTag)
                 .ToList();
 
-            var linkXmlFilePath = Path.Combine(assetsDir, "link.xml");
+            var linkXmlFilePath = Path.Combine(assetsDir, _settings.FolderPath, "link.xml");
+
+            Directory.CreateDirectory(Path.GetDirectoryName(linkXmlFilePath) ?? throw new InvalidOperationException($"No directory in file name {linkXmlFilePath}"));
 
             using (var fileStream = File.Open(linkXmlFilePath, FileMode.Create))
             using (var streamWriter = new StreamWriter(fileStream))
@@ -42,7 +43,16 @@ namespace LinkerGenerator
             }
         }
 
+        private bool NotIgnored(string assemblyName) => !_settings.AssembliesToIgnore.Contains(assemblyName);
+
         private static string CreateAssemblyLinkTag(string assemblyName) => $"\t<assembly fullname=\"{assemblyName}\" preserve=\"all\" />";
-        private static bool AllowedForPreserve(string assemblyName) => !DontPreserveAssemblies.Contains(assemblyName);
+
+        [MenuItem("Window / Linker / Generate link.xml")]
+        public static void GenerateLinkXml()
+        {
+            var settings = LinkerSettings.GetOrCreateSettings();
+
+            new LinkerGenerator(settings).Generate();
+        }
     }
 }
