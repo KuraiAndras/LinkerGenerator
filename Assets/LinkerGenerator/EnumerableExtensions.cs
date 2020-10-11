@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LinkerGenerator
 {
@@ -12,5 +13,7 @@ namespace LinkerGenerator
                 action(item);
             }
         }
+
+        public static IEnumerable<TItem> Concat<TItem>(this IEnumerable<TItem> enumerable, TItem item) => enumerable.Concat(new[] { item });
     }
 }
