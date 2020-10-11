@@ -1,0 +1,19 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2.1.0
+
+      - name: Publish LinkerGenerator to openupm
+        uses: Klemensas/action-autotag@1.2.3
+        with:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          package_root: "Assets/LinkerGenerator"
