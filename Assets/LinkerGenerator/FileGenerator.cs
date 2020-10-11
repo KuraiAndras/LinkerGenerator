@@ -17,11 +17,10 @@ namespace LinkerGenerator
         {
             var assetsDir = Application.dataPath;
 
-            var dlls = _settings.AddDlls ? GetDllAssemblyNames(assetsDir) : new string[0];
-            var asmdefs = _settings.AddAsmdefs ? GetAsmdefAssemblyNames() : new string[0];
-
-            var assembliesToPreserve = dlls
-                .Concat(asmdefs)
+            var assembliesToPreserve = Enumerable
+                .Empty<string>()
+                .Concat(_settings.AddDlls ? GetDllAssemblyNames(assetsDir) : Array.Empty<string>())
+                .Concat(_settings.AddAsmdefs ? GetAsmdefAssemblyNames() : Array.Empty<string>())
                 .Where(NotIgnored)
                 .ToArray();
 
@@ -34,15 +33,14 @@ namespace LinkerGenerator
             using (var fileStream = File.Open(linkXmlFilePath, FileMode.Create))
             using (var streamWriter = new StreamWriter(fileStream))
             {
-                streamWriter.WriteLine("<linker>");
-
-                streamWriter.WriteLine();
-
-                assembliesToPreserve.Select(CreateAssemblyLinkTag).ForEach(d => streamWriter.WriteLine(d));
-
-                streamWriter.WriteLine();
-
-                streamWriter.WriteLine("</linker>");
+                Enumerable
+                    .Empty<string>()
+                    .Concat("<linker>")
+                    .Concat(string.Empty)
+                    .Concat(assembliesToPreserve.Select(assemblyName => $"    <assembly fullname=\"{assemblyName}\" preserve=\"all\" />"))
+                    .Concat(string.Empty)
+                    .Concat("</linker>")
+                    .ForEach(streamWriter.WriteLine);
             }
         }
 
@@ -59,8 +57,6 @@ namespace LinkerGenerator
                 .ToArray();
 
         private bool NotIgnored(string assemblyName) => !_settings.AssembliesToIgnore.Contains(assemblyName);
-
-        private static string CreateAssemblyLinkTag(string assemblyName) => $"\t<assembly fullname=\"{assemblyName}\" preserve=\"all\" />";
 
         [MenuItem("Window / Linker / Generate link.xml")]
         public static void GenerateLinkXml()
