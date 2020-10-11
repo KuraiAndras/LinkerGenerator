@@ -2,27 +2,30 @@
 using System.IO;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Compilation;
 using UnityEngine;
 
 namespace LinkerGenerator
 {
-    public class LinkerGenerator
+    public class FileGenerator
     {
         private readonly LinkerSettings _settings;
 
-        public LinkerGenerator(LinkerSettings settings) => _settings = settings;
+        public FileGenerator(LinkerSettings settings) => _settings = settings;
 
         public void Generate()
         {
             var assetsDir = Application.dataPath;
-            var dllsDir = Path.Combine(assetsDir, "NugetDlls");
 
-            var dllTags = Directory.EnumerateFiles(dllsDir, "*.dll")
-                .Distinct()
-                .Select(Path.GetFileNameWithoutExtension)
+            var dlls = _settings.AddDlls ? GetDllAssemblyNames(assetsDir) : new string[0];
+            var asmdefs = _settings.AddAsmdefs ? GetAsmdefAssemblyNames() : new string[0];
+
+            var assembliesToPreserve = dlls
+                .Concat(asmdefs)
                 .Where(NotIgnored)
-                .Select(CreateAssemblyLinkTag)
-                .ToList();
+                .ToArray();
+
+            if (assembliesToPreserve.Length == 0) Debug.Log("Found nothing to preserve.");
 
             var linkXmlFilePath = Path.Combine(assetsDir, _settings.FolderPath, "link.xml");
 
@@ -35,13 +38,25 @@ namespace LinkerGenerator
 
                 streamWriter.WriteLine();
 
-                dllTags.ForEach(d => streamWriter.WriteLine(d));
+                assembliesToPreserve.Select(CreateAssemblyLinkTag).ForEach(d => streamWriter.WriteLine(d));
 
                 streamWriter.WriteLine();
 
                 streamWriter.WriteLine("</linker>");
             }
         }
+
+        private static string[] GetAsmdefAssemblyNames() =>
+            CompilationPipeline.GetAssemblies(AssembliesType.PlayerWithoutTestAssemblies)
+                .Select(a => a.name)
+                .Distinct()
+                .ToArray();
+
+        private static string[] GetDllAssemblyNames(string assetsDir) =>
+            Directory.EnumerateFiles(assetsDir, "*.dll", SearchOption.AllDirectories)
+                .Distinct()
+                .Select(Path.GetFileNameWithoutExtension)
+                .ToArray();
 
         private bool NotIgnored(string assemblyName) => !_settings.AssembliesToIgnore.Contains(assemblyName);
 
@@ -52,7 +67,7 @@ namespace LinkerGenerator
         {
             var settings = LinkerSettings.GetOrCreateSettings();
 
-            new LinkerGenerator(settings).Generate();
+            new FileGenerator(settings).Generate();
         }
     }
 }
