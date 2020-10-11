@@ -4,7 +4,7 @@ An editor utility which will generate a link.xml file with the press of a button
 
 ![Window Menu](/.github/images/WindowMenu.png)
 
-The plugin will enumerate all .dll files in you Assets folder and generate a link.xml file which will preserve all of them.
+The plugin can find all added dlls and compiled scripting assemblies and generate a link.xml file which will preserve all of them.
 
 You can customize the generation in the project settings
 
