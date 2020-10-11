@@ -1,0 +1,10 @@
+{
+    "name": "com.linkergenerator",
+    "description": "Generate link.xml file for Unity",
+    "version": "1.0.0",
+    "author": {
+        "name": "Kurai András",
+        "email": "k.andras9642@gmail.com",
+        "url": "https://github.com/KuraiAndras/LinkerGenerator"
+    }
+}

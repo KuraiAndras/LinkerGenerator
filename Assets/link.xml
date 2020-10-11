@@ -1,0 +1,7 @@
+<linker>
+
+	<assembly fullname="Injecter" preserve="all" />
+	<assembly fullname="MainThreadDispatcher" preserve="all" />
+	<assembly fullname="Microsoft.Extensions.DependencyInjection.Abstractions" preserve="all" />
+
+</linker>
