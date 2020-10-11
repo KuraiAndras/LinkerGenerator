@@ -15,3 +15,5 @@ MonoBehaviour:
   _assembliesToIgnore:
   - IndexRange
   _folderPath: 
+  _addDlls: 1
+  _addAsmdefs: 0
