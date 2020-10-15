@@ -9,6 +9,7 @@ namespace LinkerGenerator
         private static readonly string SettingsPath = "Assets/LinkerSettings.asset";
 
         [SerializeField] private List<string> _assembliesToIgnore;
+        [SerializeField] private List<string> _assemblyPatternsToIgnore;
 
         [SerializeField]
         [Tooltip("Relative path from the Assets folder.")]
@@ -19,6 +20,7 @@ namespace LinkerGenerator
 
 
         public IReadOnlyCollection<string> AssembliesToIgnore => _assembliesToIgnore;
+        public IReadOnlyCollection<string> AssemblyPatternsToIgnore => _assemblyPatternsToIgnore;
         public string FolderPath => _folderPath;
         public bool AddDlls => _addDlls;
         public bool AddAsmdefs => _addAsmdefs;
@@ -54,6 +56,7 @@ namespace LinkerGenerator
                     var settings = GetSerializedSettings();
 
                     EditorGUILayout.PropertyField(settings.FindProperty(nameof(_assembliesToIgnore)), new GUIContent("Assemblies to ignore"));
+                    EditorGUILayout.PropertyField(settings.FindProperty(nameof(_assemblyPatternsToIgnore)), new GUIContent("Assemblies to ignore (Regex)"));
                     EditorGUILayout.PropertyField(settings.FindProperty(nameof(_folderPath)), new GUIContent("Link.xml folder path"));
                     EditorGUILayout.PropertyField(settings.FindProperty(nameof(_addDlls)), new GUIContent("Scan for DLLs"));
                     EditorGUILayout.PropertyField(settings.FindProperty(nameof(_addAsmdefs)), new GUIContent("Scan for ASMDEF files"));
