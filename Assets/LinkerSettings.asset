@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _assembliesToIgnore:
   - IndexRange
+  _assemblyPatternsToIgnore: []
   _folderPath: 
   _addDlls: 1
   _addAsmdefs: 0

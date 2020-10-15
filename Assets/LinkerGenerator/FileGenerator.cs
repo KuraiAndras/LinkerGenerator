@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.Compilation;
 using UnityEngine;
@@ -21,10 +22,10 @@ namespace LinkerGenerator
                 .Empty<string>()
                 .Concat(_settings.AddDlls ? GetDllAssemblyNames(assetsDir) : Array.Empty<string>())
                 .Concat(_settings.AddAsmdefs ? GetAsmdefAssemblyNames() : Array.Empty<string>())
-                .Where(NotIgnored)
-                .ToArray();
-
-            if (assembliesToPreserve.Length == 0) Debug.Log("Found nothing to preserve.");
+                .Distinct()
+                .Where(NotIgnoredByName)
+                .Where(NotIgnoredByPattern)
+                .OrderBy(s => s);
 
             var linkXmlFilePath = Path.Combine(assetsDir, _settings.FolderPath, "link.xml");
 
@@ -56,7 +57,22 @@ namespace LinkerGenerator
                 .Select(Path.GetFileNameWithoutExtension)
                 .ToArray();
 
-        private bool NotIgnored(string assemblyName) => !_settings.AssembliesToIgnore.Contains(assemblyName);
+        private bool NotIgnoredByName(string assemblyName) => !_settings.AssembliesToIgnore.Contains(assemblyName);
+
+        private bool NotIgnoredByPattern(string assemblyName) => !_settings
+            .AssemblyPatternsToIgnore
+            .Any(p =>
+            {
+                try
+                {
+                    return new Regex(p).IsMatch(assemblyName);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"Invalid regex: {e.Message}");
+                    return false;
+                }
+            });
 
         [MenuItem("Window / Linker / Generate link.xml")]
         public static void GenerateLinkXml()
