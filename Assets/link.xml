@@ -3,5 +3,7 @@
     <assembly fullname="Injecter" preserve="all" />
     <assembly fullname="MainThreadDispatcher" preserve="all" />
     <assembly fullname="Microsoft.Extensions.DependencyInjection.Abstractions" preserve="all" />
+    <assembly fullname="System.IO.Compression" preserve="all" />
+    <assembly fullname="System.IO.Compression.FileSystem" preserve="all" />
 
 </linker>
