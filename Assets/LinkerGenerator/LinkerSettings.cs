@@ -17,6 +17,7 @@ namespace LinkerGenerator
 
         [SerializeField] private bool _addDlls;
         [SerializeField] private bool _addAsmdefs;
+        [SerializeField] private bool _addRsps;
 
 
         public IReadOnlyCollection<string> AssembliesToIgnore => _assembliesToIgnore;
@@ -24,22 +25,22 @@ namespace LinkerGenerator
         public string FolderPath => _folderPath;
         public bool AddDlls => _addDlls;
         public bool AddAsmdefs => _addAsmdefs;
+        public bool AddRsps => _addRsps;
 
         public static LinkerSettings GetOrCreateSettings()
         {
             var settings = AssetDatabase.LoadAssetAtPath<LinkerSettings>(SettingsPath);
-            if (settings == null)
-            {
-                settings = CreateInstance<LinkerSettings>();
+            if (settings != null) return settings;
 
-                settings._assembliesToIgnore = new List<string>();
-                settings._folderPath = string.Empty;
-                settings._addDlls = true;
-                settings._addAsmdefs = false;
+            settings = CreateInstance<LinkerSettings>();
 
-                AssetDatabase.CreateAsset(settings, SettingsPath);
-                AssetDatabase.SaveAssets();
-            }
+            settings._assembliesToIgnore = new List<string>();
+            settings._folderPath = string.Empty;
+            settings._addDlls = true;
+            settings._addAsmdefs = false;
+
+            AssetDatabase.CreateAsset(settings, SettingsPath);
+            AssetDatabase.SaveAssets();
 
             return settings;
         }
@@ -60,6 +61,7 @@ namespace LinkerGenerator
                     EditorGUILayout.PropertyField(settings.FindProperty(nameof(_folderPath)), new GUIContent("Link.xml folder path"));
                     EditorGUILayout.PropertyField(settings.FindProperty(nameof(_addDlls)), new GUIContent("Scan for DLLs"));
                     EditorGUILayout.PropertyField(settings.FindProperty(nameof(_addAsmdefs)), new GUIContent("Scan for ASMDEF files"));
+                    EditorGUILayout.PropertyField(settings.FindProperty(nameof(_addRsps)), new GUIContent("Scan for Rsp files"));
 
                     settings.ApplyModifiedProperties();
                 },

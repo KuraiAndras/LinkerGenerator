@@ -6,6 +6,8 @@ An editor utility which will generate a link.xml file with the press of a button
 
 The plugin can find all added dlls and compiled scripting assemblies and generate a link.xml file which will preserve all of them.
 
+.RSP files will also be scanned, and assemblies preceded by the "-r:" mark can be found.
+
 You can customize the generation in the project settings
 
 ![Project Settings](/.github/images/ProjectSettings.png)
