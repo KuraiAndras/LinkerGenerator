@@ -2,7 +2,7 @@
     "name": "com.linkergenerator",
     "displayName": "Linker Generator",
     "description": "Generate link.xml file for Unity",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "author": {
         "name": "Kurai András",
         "email": "k.andras9642@gmail.com",
