@@ -26,7 +26,6 @@ namespace LinkerGenerator
         [SerializeField] private bool _addAsmdefs;
         [SerializeField] private bool _addRsps;
 
-
         public IReadOnlyCollection<string> AssembliesToIgnore => _assembliesToIgnore;
         public IReadOnlyCollection<string> AssemblyPatternsToIgnore => _assemblyPatternsToIgnore;
 

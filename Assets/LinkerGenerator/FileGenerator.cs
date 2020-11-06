@@ -19,6 +19,10 @@ namespace LinkerGenerator
         {
             var assetsDir = Application.dataPath;
 
+            var linkXmlFilePath = Path.Combine(assetsDir, _settings.FolderPath, "link.xml");
+
+            Directory.CreateDirectory(Path.GetDirectoryName(linkXmlFilePath) ?? throw new InvalidOperationException($"No directory in file name {linkXmlFilePath}"));
+
             var assembliesToPreserve = Enumerable.Empty<string>()
                 .Concat(GetDllAssemblyNames(assetsDir))
                 .Concat(GetAsmdefAssemblyNames())
@@ -27,10 +31,6 @@ namespace LinkerGenerator
                 .Where(NotIgnoredByName)
                 .Where(NotIgnoredByPattern)
                 .OrderBy(s => s);
-
-            var linkXmlFilePath = Path.Combine(assetsDir, _settings.FolderPath, "link.xml");
-
-            Directory.CreateDirectory(Path.GetDirectoryName(linkXmlFilePath) ?? throw new InvalidOperationException($"No directory in file name {linkXmlFilePath}"));
 
             var content = Enumerable.Empty<string>()
                 .Concat("<linker>")
