@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
-using UnityEditor;
 using UnityEditor.Compilation;
 using UnityEngine;
 
@@ -19,6 +19,10 @@ namespace LinkerGenerator
         {
             var assetsDir = Application.dataPath;
 
+            var linkXmlFilePath = Path.Combine(assetsDir, _settings.FolderPath, "link.xml");
+
+            Directory.CreateDirectory(Path.GetDirectoryName(linkXmlFilePath) ?? throw new InvalidOperationException($"No directory in file name {linkXmlFilePath}"));
+
             var assembliesToPreserve = Enumerable.Empty<string>()
                 .Concat(GetDllAssemblyNames(assetsDir))
                 .Concat(GetAsmdefAssemblyNames())
@@ -28,20 +32,18 @@ namespace LinkerGenerator
                 .Where(NotIgnoredByPattern)
                 .OrderBy(s => s);
 
-            var linkXmlFilePath = Path.Combine(assetsDir, _settings.FolderPath, "link.xml");
-
-            Directory.CreateDirectory(Path.GetDirectoryName(linkXmlFilePath) ?? throw new InvalidOperationException($"No directory in file name {linkXmlFilePath}"));
+            var content = Enumerable.Empty<string>()
+                .Concat("<linker>")
+                .Concat(string.Empty)
+                .Concat(assembliesToPreserve.Select(assemblyName => $"    <assembly fullname=\"{assemblyName}\" preserve=\"all\" />"))
+                .Concat(string.Empty)
+                .Concat("</linker>")
+                .Aggregate(new StringBuilder(), (builder, line) => builder.AppendLine(line));
 
             using (var fileStream = File.Open(linkXmlFilePath, FileMode.Create))
             using (var streamWriter = new StreamWriter(fileStream))
             {
-                Enumerable.Empty<string>()
-                    .Concat("<linker>")
-                    .Concat(string.Empty)
-                    .Concat(assembliesToPreserve.Select(assemblyName => $"    <assembly fullname=\"{assemblyName}\" preserve=\"all\" />"))
-                    .Concat(string.Empty)
-                    .Concat("</linker>")
-                    .ForEach(streamWriter.WriteLine);
+                streamWriter.Write(content);
             }
         }
 
@@ -83,13 +85,5 @@ namespace LinkerGenerator
                     return false;
                 }
             });
-
-        [MenuItem("Window / Linker / Generate link.xml")]
-        public static void GenerateLinkXml()
-        {
-            var settings = LinkerSettings.GetOrCreateSettings();
-
-            new FileGenerator(settings).Generate();
-        }
     }
 }

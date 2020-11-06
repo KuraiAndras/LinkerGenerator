@@ -6,7 +6,14 @@ namespace LinkerGenerator
 {
     public sealed class LinkerSettings : ScriptableObject
     {
-        private static readonly string SettingsPath = "Assets/LinkerSettings.asset";
+        private const string SettingsPath = "Assets/LinkerSettings.asset";
+
+        public const string AssembliesToIgnoreName = nameof(_assembliesToIgnore);
+        public const string AssemblyPatternsToIgnoreName = nameof(_assemblyPatternsToIgnore);
+        public const string FolderPathName = nameof(_folderPath);
+        public const string AddDllsName = nameof(_addDlls);
+        public const string AddAsmdefsName = nameof(_addAsmdefs);
+        public const string AddRspsName = nameof(_addRsps);
 
         [SerializeField] private List<string> _assembliesToIgnore;
         [SerializeField] private List<string> _assemblyPatternsToIgnore;
@@ -19,9 +26,9 @@ namespace LinkerGenerator
         [SerializeField] private bool _addAsmdefs;
         [SerializeField] private bool _addRsps;
 
-
         public IReadOnlyCollection<string> AssembliesToIgnore => _assembliesToIgnore;
         public IReadOnlyCollection<string> AssemblyPatternsToIgnore => _assemblyPatternsToIgnore;
+
         public string FolderPath => _folderPath;
         public bool AddDlls => _addDlls;
         public bool AddAsmdefs => _addAsmdefs;
@@ -46,26 +53,5 @@ namespace LinkerGenerator
         }
 
         public static SerializedObject GetSerializedSettings() => new SerializedObject(GetOrCreateSettings());
-
-        [SettingsProvider]
-        public static SettingsProvider CreateSettingsProvider() =>
-            new SettingsProvider("Project/LinkerSettings", SettingsScope.Project)
-            {
-                label = "Linker",
-                guiHandler = searchContext =>
-                {
-                    var settings = GetSerializedSettings();
-
-                    EditorGUILayout.PropertyField(settings.FindProperty(nameof(_assembliesToIgnore)), new GUIContent("Assemblies to ignore"));
-                    EditorGUILayout.PropertyField(settings.FindProperty(nameof(_assemblyPatternsToIgnore)), new GUIContent("Assemblies to ignore (Regex)"));
-                    EditorGUILayout.PropertyField(settings.FindProperty(nameof(_folderPath)), new GUIContent("Link.xml folder path"));
-                    EditorGUILayout.PropertyField(settings.FindProperty(nameof(_addDlls)), new GUIContent("Scan for DLLs"));
-                    EditorGUILayout.PropertyField(settings.FindProperty(nameof(_addAsmdefs)), new GUIContent("Scan for ASMDEF files"));
-                    EditorGUILayout.PropertyField(settings.FindProperty(nameof(_addRsps)), new GUIContent("Scan for Rsp files"));
-
-                    settings.ApplyModifiedProperties();
-                },
-                keywords = new HashSet<string>(new[] { "Dll", "Linker" }),
-            };
     }
 }
