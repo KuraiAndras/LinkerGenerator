@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.Compilation;
@@ -32,16 +33,18 @@ namespace LinkerGenerator
 
             Directory.CreateDirectory(Path.GetDirectoryName(linkXmlFilePath) ?? throw new InvalidOperationException($"No directory in file name {linkXmlFilePath}"));
 
+            var content = Enumerable.Empty<string>()
+                .Concat("<linker>")
+                .Concat(string.Empty)
+                .Concat(assembliesToPreserve.Select(assemblyName => $"    <assembly fullname=\"{assemblyName}\" preserve=\"all\" />"))
+                .Concat(string.Empty)
+                .Concat("</linker>")
+                .Aggregate(new StringBuilder(), (builder, line) => builder.AppendLine(line));
+
             using (var fileStream = File.Open(linkXmlFilePath, FileMode.Create))
             using (var streamWriter = new StreamWriter(fileStream))
             {
-                Enumerable.Empty<string>()
-                    .Concat("<linker>")
-                    .Concat(string.Empty)
-                    .Concat(assembliesToPreserve.Select(assemblyName => $"    <assembly fullname=\"{assemblyName}\" preserve=\"all\" />"))
-                    .Concat(string.Empty)
-                    .Concat("</linker>")
-                    .ForEach(streamWriter.WriteLine);
+                streamWriter.Write(content);
             }
         }
 
