@@ -1,10 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using UnityEditor;
 using UnityEditor.Compilation;
 using UnityEngine;
 
@@ -86,13 +85,5 @@ namespace LinkerGenerator
                     return false;
                 }
             });
-
-        [MenuItem("Window / Linker / Generate link.xml")]
-        public static void GenerateLinkXml()
-        {
-            var settings = LinkerSettings.GetOrCreateSettings();
-
-            new FileGenerator(settings).Generate();
-        }
     }
 }
